@@ -1,0 +1,3 @@
+topic: "mytopic"
+channel: "worker-nsq-demo"
+handlerConcurrency: 12
