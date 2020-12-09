@@ -44,7 +44,7 @@ type Worker struct {
 
 func (w *Worker) Start(ctx context.Context) {
 	if w.MessageHandler == nil {
-		log.Fatalln("[ig/worker-nsq] %% Error: the MessageHandler cannot be nil.")
+		log.Fatalln("[bcow-go/worker-nsq] %% Error: the MessageHandler cannot be nil.")
 	}
 
 	if w.Consumer == nil {
@@ -65,7 +65,7 @@ func (w *Worker) Start(ctx context.Context) {
 
 			q, err := nsq.NewConsumer(w.Topic, w.Channel, config)
 			if err != nil {
-				log.Fatalf("[ig/worker-nsq]  %% Error: cannot connect to nsq. %v\n", err)
+				log.Fatalf("[bcow-go/worker-nsq]  %% Error: cannot connect to nsq. %v\n", err)
 			}
 
 			w.Consumer = q
@@ -76,8 +76,8 @@ func (w *Worker) Start(ctx context.Context) {
 
 	defer func() {
 		q.Stop()
-		log.Printf("[ig/worker-nsq] Stats: %+v\n", q.Stats())
-		log.Printf("[ig/worker-nsq] IsStarved: %+v\n", q.IsStarved())
+		log.Printf("[bcow-go/worker-nsq] Stats: %+v\n", q.Stats())
+		log.Printf("[bcow-go/worker-nsq] IsStarved: %+v\n", q.IsStarved())
 	}()
 
 	// bind the MessageHandler
@@ -88,12 +88,12 @@ func (w *Worker) Start(ctx context.Context) {
 	// get connection and connect to nsqd or lookupd
 	connectToNSQ, err := nsqConnectionFactory.getInstance(w.NsqConnectionTarget)
 	if err != nil {
-		log.Fatalf("[ig/worker-nsq] cannot connect to nsq. %v\n", err)
+		log.Fatalf("[bcow-go/worker-nsq] cannot connect to nsq. %v\n", err)
 	}
 	connectToNSQ(q, w.NsqAddresses)
 
 	// start listening
-	log.Printf("[ig/worker-nsq] %s/%s started\n", w.Topic, w.Channel)
+	log.Printf("[bcow-go/worker-nsq] %s/%s started\n", w.Topic, w.Channel)
 	<-q.StopChan
 }
 
