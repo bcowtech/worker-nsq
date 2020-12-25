@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"gitlab.bcowtech.de/bcow-go/config"
+	"gitlab.bcowtech.de/bcow-go/host"
 	nsq "gitlab.bcowtech.de/bcow-go/worker-nsq"
 )
 
@@ -18,7 +19,10 @@ func Test(t *testing.T) {
 	initializeArgs()
 
 	app := MockApp{}
-	starter := nsq.Startup(&app).
+	starter := nsq.Startup(&app,
+		[]host.Middleware{
+			nsq.UseMessageHandler(&MockMessageHandler{}),
+		}...).
 		ConfigureConfiguration(func(service *config.ConfigurationService) {
 			service.
 				LoadEnvironmentVariables("").

@@ -7,16 +7,16 @@ import (
 type (
 	connectToNSQFunc func(consumer *Consumer, addresses []string) error
 
-	nsqConnectionFuncProvider map[string]connectToNSQFunc
+	connectionFuncProvider map[string]connectToNSQFunc
 )
 
-var nsqConnectionFactory = nsqConnectionFuncProvider(
+var connectionProvider = connectionFuncProvider(
 	map[string]connectToNSQFunc{
-		Nsqd:       connectToNSQDFunc,
-		NsqLookupd: connectToNSQLookupdFunc,
+		Nsqd:       connectToNSQD,
+		NsqLookupd: connectToNSQLookupd,
 	})
 
-func (f nsqConnectionFuncProvider) getInstance(connectionTarget string) (connectToNSQFunc, error) {
+func (f connectionFuncProvider) getInstance(connectionTarget string) (connectToNSQFunc, error) {
 	fn, ok := f[connectionTarget]
 	if !ok {
 		return nil, fmt.Errorf("unknown target '%v'", connectionTarget)
@@ -25,11 +25,11 @@ func (f nsqConnectionFuncProvider) getInstance(connectionTarget string) (connect
 }
 
 // Connect to NSQ using nsqd addresses.
-func connectToNSQDFunc(consumer *Consumer, addresses []string) error {
+func connectToNSQD(consumer *Consumer, addresses []string) error {
 	return consumer.ConnectToNSQDs(addresses)
 }
 
 // Connect to NSQ using nsqlookupd addresses.
-func connectToNSQLookupdFunc(consumer *Consumer, addresses []string) error {
+func connectToNSQLookupd(consumer *Consumer, addresses []string) error {
 	return consumer.ConnectToNSQLookupds(addresses)
 }

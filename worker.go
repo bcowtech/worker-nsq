@@ -4,75 +4,43 @@ import (
 	"context"
 	"log"
 	"sync"
-	"time"
 
 	nsq "github.com/nsqio/go-nsq"
-)
-
-const (
-	DEFAULT_CONFIG_MAX_IN_FLIGHT         = 8
-	DEFAULT_CONFIG_HEARTBEAT_INTERVAL    = 10
-	DEFAULT_CONFIG_DEFAULT_REQUEUE_DELAY = 0
-	DEFAULT_CONFIG_MAX_BACKOFF_DURATION  = time.Millisecond * 50
-
-	DEFAULT_HANDLER_CONCURRENCY = 12
-
-	Nsqd       = "nsqd"
-	NsqLookupd = "nsqlookupd"
 )
 
 type (
 	Consumer           = nsq.Consumer
 	Config             = nsq.Config
 	Message            = nsq.Message
+	MessageHandler     = nsq.Handler
 	MessageHandlerFunc = nsq.HandlerFunc
 )
 
 type Worker struct {
-	Consumer            *Consumer
-	NsqConnectionTarget string
+	NsqConnectionTarget string // nsqd, nsqlookupd
 	NsqAddresses        []string
 	Topic               string
 	Channel             string
 	HandlerConcurrency  int
 	Config              *Config
-	MessageHandler      MessageHandlerFunc
 
+	messageHandler MessageHandler
+
+	consumer         *Consumer
 	consumerSyncOnce sync.Once
 	wg               sync.WaitGroup
 }
 
 func (w *Worker) Start(ctx context.Context) {
-	if w.MessageHandler == nil {
-		log.Fatalln("[bcow-go/worker-nsq] %% Error: the MessageHandler cannot be nil.")
+	if w.messageHandler == nil {
+		log.Fatalln("[bcow-go/worker-nsq] %% Error: the MessageHandler is nil. Using UseMessagehandler() register one")
 	}
 
-	if w.Consumer == nil {
-		w.consumerSyncOnce.Do(func() {
-			var config *Config = w.Config
+	w.consumerSyncOnce.Do(func() {
+		w.consumer = w.createConsumer()
+	})
 
-			if config == nil {
-				c := nsq.NewConfig()
-				{
-					c.MaxInFlight = DEFAULT_CONFIG_MAX_IN_FLIGHT
-					c.HeartbeatInterval = DEFAULT_CONFIG_HEARTBEAT_INTERVAL
-					c.DefaultRequeueDelay = DEFAULT_CONFIG_DEFAULT_REQUEUE_DELAY
-					c.MaxBackoffDuration = DEFAULT_CONFIG_MAX_BACKOFF_DURATION
-				}
-				// export
-				config = c
-			}
-
-			q, err := nsq.NewConsumer(w.Topic, w.Channel, config)
-			if err != nil {
-				log.Fatalf("[bcow-go/worker-nsq]  %% Error: cannot connect to nsq. %v\n", err)
-			}
-
-			w.Consumer = q
-		})
-	}
-
-	q := w.Consumer
+	q := w.consumer
 
 	defer func() {
 		q.Stop()
@@ -86,7 +54,7 @@ func (w *Worker) Start(ctx context.Context) {
 		w.HandlerConcurrency)
 
 	// get connection and connect to nsqd or lookupd
-	connectToNSQ, err := nsqConnectionFactory.getInstance(w.NsqConnectionTarget)
+	connectToNSQ, err := connectionProvider.getInstance(w.NsqConnectionTarget)
 	if err != nil {
 		log.Fatalf("[bcow-go/worker-nsq] cannot connect to nsq. %v\n", err)
 	}
@@ -98,8 +66,12 @@ func (w *Worker) Start(ctx context.Context) {
 }
 
 func (w *Worker) Stop(ctx context.Context) error {
-	w.wg.Wait()
-	w.Consumer.Stop()
+	log.Printf("[bcow-go/worker-nsq] %% Stop\n")
+
+	if w.consumer != nil {
+		w.wg.Wait()
+		w.consumer.Stop()
+	}
 	return nil
 }
 
@@ -109,8 +81,32 @@ func (w *Worker) processMessage(m *nsq.Message) error {
 		w.wg.Done()
 	}()
 
-	if w.MessageHandler != nil {
-		return w.MessageHandler(m)
+	if w.messageHandler != nil {
+		return w.messageHandler.HandleMessage(m)
+	} else {
+
 	}
 	return nil
+}
+
+func (w *Worker) createConsumer() *Consumer {
+	var config *Config = w.Config
+
+	if config == nil {
+		c := nsq.NewConfig()
+		{
+			c.MaxInFlight = DEFAULT_CONFIG_MAX_IN_FLIGHT
+			c.HeartbeatInterval = DEFAULT_CONFIG_HEARTBEAT_INTERVAL
+			c.DefaultRequeueDelay = DEFAULT_CONFIG_DEFAULT_REQUEUE_DELAY
+			c.MaxBackoffDuration = DEFAULT_CONFIG_MAX_BACKOFF_DURATION
+		}
+		// export
+		config = c
+	}
+
+	q, err := nsq.NewConsumer(w.Topic, w.Channel, config)
+	if err != nil {
+		log.Fatalf("[bcow-go/worker-nsq]  %% Error: cannot connect to nsq. %v\n", err)
+	}
+	return q
 }

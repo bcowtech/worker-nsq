@@ -1,9 +1,6 @@
 package test
 
 import (
-	"fmt"
-	"time"
-
 	nsq "gitlab.bcowtech.de/bcow-go/worker-nsq"
 )
 
@@ -26,10 +23,12 @@ type (
 	}
 
 	ServiceProvider struct {
+		ResouceName string
 	}
 )
 
 func (provider *ServiceProvider) Init(conf *Config) {
+	provider.ResouceName = "demo resource"
 }
 
 func (h *Host) Init(conf *Config) {
@@ -38,18 +37,4 @@ func (h *Host) Init(conf *Config) {
 	h.Topic = conf.Topic
 	h.Channel = conf.Channel
 	h.HandlerConcurrency = conf.HandlerConcurrency
-	h.MessageHandler = func(m *nsq.Message) error {
-		if len(m.Body) == 0 {
-			// Returning nil will automatically send a FIN command to NSQ to mark the message as processed.
-			// In this case, a message with an empty body is simply ignored/discarded.
-			return nil
-		}
-
-		fmt.Println("======= message start")
-		fmt.Println(string(m.Body))
-		time.Sleep(time.Duration(4) * time.Second)
-		fmt.Println("======= message end")
-
-		return nil
-	}
 }

@@ -13,13 +13,22 @@ var (
 
 type hostProvider struct{}
 
-func (p *hostProvider) Init(h host.Host, app *host.AppContext) {
+func (p *hostProvider) Init(h host.Host, ctx *host.Context) {
 }
 
-func (p *hostProvider) ConfigureHostComponent(h host.Host, app *host.AppContext) {
+func (p *hostProvider) PostLoadMiddleware(h host.Host, ctx *host.Context) {
 }
 
-func (p *hostProvider) ConvertFromValue(rv reflect.Value) host.Host {
+func (p *hostProvider) Emit(rv reflect.Value) host.Host {
 	rvHost := reflect.NewAt(typeOfHost, unsafe.Pointer(rv.Pointer()))
-	return rvHost.Interface().(host.Host)
+	v, ok := rvHost.Interface().(host.Host)
+	if ok {
+		return v
+	}
+	return nil
+}
+
+func (p *hostProvider) asNsqWorker(rv reflect.Value) *Worker {
+	return reflect.NewAt(typeOfHost, unsafe.Pointer(rv.Pointer())).
+		Interface().(*Worker)
 }
