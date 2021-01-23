@@ -47,19 +47,19 @@ func Test(t *testing.T) {
 	{
 		conf := app.Config
 		if conf.NsqConnectionTarget != nsq.NsqLookupd {
-			t.Errorf("assert 'Config.NsqConnectionTarget':: excepted '%v', got '%v'", nsq.NsqLookupd, conf.NsqConnectionTarget)
+			t.Errorf("assert 'Config.NsqConnectionTarget':: expected '%v', got '%v'", nsq.NsqLookupd, conf.NsqConnectionTarget)
 		}
 		if 0 == len(conf.NsqAddresses) {
 			t.Errorf("assert 'Config.NsqAddresses':: should not be empty")
 		}
 		if conf.Topic != "mytopic" {
-			t.Errorf("assert 'Config.Topic':: excepted '%v', got '%v'", "mytopic", conf.Topic)
+			t.Errorf("assert 'Config.Topic':: expected '%v', got '%v'", "mytopic", conf.Topic)
 		}
 		if conf.Channel != "worker-nsq-demo" {
-			t.Errorf("assert 'Config.Channel':: excepted '%v', got '%v'", "worker-nsq-demo", conf.Channel)
+			t.Errorf("assert 'Config.Channel':: expected '%v', got '%v'", "worker-nsq-demo", conf.Channel)
 		}
 		if conf.HandlerConcurrency != 8 {
-			t.Errorf("assert 'Config.PollingTimeoutMs':: excepted '%v', got '%v'", 8, conf.HandlerConcurrency)
+			t.Errorf("assert 'Config.PollingTimeoutMs':: expected '%v', got '%v'", 8, conf.HandlerConcurrency)
 		}
 	}
 }

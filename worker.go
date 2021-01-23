@@ -69,8 +69,15 @@ func (w *Worker) Stop(ctx context.Context) error {
 	log.Printf("[bcow-go/worker-nsq] %% Stop\n")
 
 	if w.consumer != nil {
+		q := w.consumer
+
+		defer func() {
+			q.Stop()
+			log.Printf("[bcow-go/worker-nsq] Stats: %+v\n", q.Stats())
+			log.Printf("[bcow-go/worker-nsq] IsStarved: %+v\n", q.IsStarved())
+		}()
+
 		w.wg.Wait()
-		w.consumer.Stop()
 	}
 	return nil
 }
