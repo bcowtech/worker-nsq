@@ -14,6 +14,7 @@ type (
 	Message            = nsq.Message
 	MessageHandler     = nsq.Handler
 	MessageHandlerFunc = nsq.HandlerFunc
+	MessageID          = nsq.MessageID
 )
 
 type Worker struct {

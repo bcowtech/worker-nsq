@@ -3,6 +3,7 @@ package nsq
 import (
 	"time"
 
+	"github.com/nsqio/go-nsq"
 	"gitlab.bcowtech.de/bcow-go/host"
 )
 
@@ -26,3 +27,7 @@ const (
 var (
 	nsqHostProvider = &hostProvider{}
 )
+
+func NewMessage(id MessageID, body []byte) *Message {
+	return nsq.NewMessage(id, body)
+}
