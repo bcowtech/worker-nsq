@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	proto "gitlab.bcowtech.de/bcow-go/structprototype"
-	"gitlab.bcowtech.de/bcow-go/structprototype/reflectutil"
+	proto "github.com/bcowtech/structprototype"
+	"github.com/bcowtech/structprototype/reflectutil"
 )
 
 type messageHandlerBindingProvider struct {

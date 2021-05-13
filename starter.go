@@ -1,7 +1,7 @@
 package nsq
 
 import (
-	"gitlab.bcowtech.de/bcow-go/host"
+	"github.com/bcowtech/host"
 )
 
 func Startup(app interface{}, middlewares ...host.Middleware) *host.Starter {

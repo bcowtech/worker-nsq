@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.bcowtech.de/bcow-go/config"
-	"gitlab.bcowtech.de/bcow-go/host"
-	nsq "gitlab.bcowtech.de/bcow-go/worker-nsq"
+	"github.com/bcowtech/config"
+	"github.com/bcowtech/host"
+	nsq "github.com/bcowtech/worker-nsq"
 )
 
 func Test(t *testing.T) {

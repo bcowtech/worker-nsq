@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"gitlab.bcowtech.de/bcow-go/host"
+	"github.com/bcowtech/host"
 )
 
 var (

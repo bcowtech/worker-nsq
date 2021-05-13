@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	nsq "gitlab.bcowtech.de/bcow-go/worker-nsq"
+	nsq "github.com/bcowtech/worker-nsq"
 )
 
 type MockMessageHandler struct {

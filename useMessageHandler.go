@@ -4,8 +4,8 @@ import (
 	"log"
 	"reflect"
 
-	"gitlab.bcowtech.de/bcow-go/host"
-	proto "gitlab.bcowtech.de/bcow-go/structprototype"
+	"github.com/bcowtech/host"
+	proto "github.com/bcowtech/structprototype"
 )
 
 func UseMessageHandler(handler MessageHandler) host.Middleware {

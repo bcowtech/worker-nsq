@@ -3,8 +3,8 @@ package nsq
 import (
 	"time"
 
+	"github.com/bcowtech/host"
 	"github.com/nsqio/go-nsq"
-	"gitlab.bcowtech.de/bcow-go/host"
 )
 
 const (

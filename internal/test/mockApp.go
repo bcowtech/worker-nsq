@@ -1,7 +1,7 @@
 package test
 
 import (
-	nsq "gitlab.bcowtech.de/bcow-go/worker-nsq"
+	nsq "github.com/bcowtech/worker-nsq"
 )
 
 type (
